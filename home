@@ -1,0 +1,523 @@
+# VAULT — SuttonFIX & Universal DPW Module
+
+**Town of Sutton, Massachusetts**
+**Framework:** VAULT™ (Verified Automation & Unified Logic for Towns)
+
+> Purpose: Deliver a complete resident-facing “Fix” site and a universal DPW work management module built on CivicOptimize (front end) with Microsoft 365 + Power Automate + SharePoint (back end). This blueprint mirrors proven municipal-first patterns and can be implemented without net-new SaaS beyond CivicPlus + M365.
+
+---
+
+## 1) Outcome & Scope
+
+**MVP outcomes**
+
+* A public “SuttonFIX” page for residents to report issues, track status, and self-serve common answers.
+* A universal DPW module for intake → triage → work orders → field updates → closeout → reporting.
+* Storage & records: standardized folders, metadata, and retention for requests, work orders, photos, and closeout artifacts.
+
+**Assumptions**
+
+* Front end: CivicPlus (CivicOptimize forms, dynamic lists, role-based dashboards).
+* Automations: Power Automate (OPA) with SharePoint/OneDrive as the system-of-record storage.
+* Optional: Laserfiche for archival copies if the Town requires.
+
+---
+
+## 2) Resident-Facing Site: **SuttonFIX**
+
+### 2.1 Information Architecture
+
+* **Home (SuttonFIX)** — hero, quick cards by category, urgent notice (storms/snow), form embed.
+* **Report an Issue** — the CivicOptimize form (embedded) + category prefill links.
+* **My Requests** — form “Lookup” by email + request ID (masked list view).
+* **Knowledge Base** — “Before you report” (potholes, downed limbs, drainage, sewer, trees in ROW, signs), after-hours guidance.
+* **Accessibility & Language** — simple reading level, high-contrast, Google Translate widget.
+
+### 2.2 Category Taxonomy (toggleable)
+
+Core DPW:
+
+* **Roads & Sidewalks** (pothole, patch, sidewalk trip hazard, curb)
+* **Trees & Vegetation** (ROW limb, fallen tree, visibility)
+* **Signs & Markings** (missing sign, damaged sign, faded lines)
+* **Drainage & Stormwater** (catch basin, culvert, ditching, flooding)
+* **Snow & Ice** (plow damage, sanding, mailbox, hydrant shoveling assist list)
+* **Litter & Illegal Dumping**
+* **Town Facilities & Grounds (DPW)** (grounds, common areas, cemeteries if applicable)
+* **Sewer (routing)** — routes to Sewer Dept queue (keeps single entry point for residents)
+
+Optional toggles:
+
+* **Parks & Recreation** (if DPW supports; otherwise route to Recreation)
+* **Cemetery** (if DPW supports; otherwise separate module)
+* **Curbside Waste & Recycling** (if Town-managed; otherwise knowledge-base to haulers)
+
+> **Note:** Categories appear for residents, but routing can send requests to the correct team/department without exposing internal structure.
+
+### 2.3 Statuses & SLAs (resident-facing)
+
+* **Received** → **In Review** → **Scheduled** → **In Progress** → **On Hold** → **Completed** → **Closed (No Action)**.
+* SLA suggestions (target windows): Intake triage same/next business day; first update within 3 business days; default completion goal set per category (e.g., pothole 10–15 business days; sign 10–20; drainage scoped seasonally). *SLA is a target, not a guarantee; show friendly disclaimer.*
+
+---
+
+## 3) CivicOptimize Form (Resident Intake)
+
+### 3.1 Field Schema (IDs are permanent, lowercase\_snake\_case)
+
+```json
+[
+  {"id":"request_id","type":"hidden","default":"auto"},
+  {"id":"created_at","type":"hidden","default":"utc_now"},
+  {"id":"category","type":"select","list":"dpw_categories","required":true},
+  {"id":"subcategory","type":"select","list":"dpw_subcategories","filter_by":"category"},
+  {"id":"description","type":"textarea","label":"Describe the issue","minlength":12,"required":true},
+  {"id":"photo","type":"file","multiple":true,"max_files":6,"accept":"image/*"},
+  {"id":"location_type","type":"radio","options":["type_address","type_map","type_intersection"],"required":true},
+  {"id":"address","type":"text","label":"Street address or nearest landmark","show_if":"location_type=type_address"},
+  {"id":"intersection_primary","type":"text","show_if":"location_type=type_intersection"},
+  {"id":"intersection_cross","type":"text","show_if":"location_type=type_intersection"},
+  {"id":"lat","type":"hidden","default":"map_lat"},
+  {"id":"lng","type":"hidden","default":"map_lng"},
+  {"id":"reporter_name","type":"text","required":true},
+  {"id":"reporter_email","type":"email","required":true},
+  {"id":"reporter_phone","type":"tel"},
+  {"id":"preferred_contact","type":"select","options":["email","phone","no_updates"]},
+  {"id":"priority_hint","type":"select","options":["low","normal","high"],"help":"If safety-related, choose high."},
+  {"id":"privacy_ack","type":"checkbox","label":"I understand my submission is a public record subject to disclosure.","required":true},
+  {"id":"consent_contact","type":"checkbox","label":"The Town may contact me about this request.","required":true}
+]
+```
+
+### 3.2 Dynamic Lists (CivicOptimize) — seed CSVs
+
+**dpw\_categories.csv**
+
+```
+id,label,is_enabled
+roads_sidewalks,Roads & Sidewalks,TRUE
+signs_markings,Signs & Markings,TRUE
+drainage_stormwater,Drainage & Stormwater,TRUE
+trees_row,Trees & Vegetation (ROW),TRUE
+snow_ice,Snow & Ice,TRUE
+litter_dumping,Litter & Illegal Dumping,TRUE
+facilities_grounds,Facilities & Grounds,TRUE
+sewer,Sewer (Routing),TRUE
+```
+
+**dpw\_subcategories.csv**
+
+```
+id,category,label
+pothole,roads_sidewalks,Pothole
+sidewalk_hazard,roads_sidewalks,Sidewalk hazard
+missing_sign,signs_markings,Missing sign
+damaged_sign,signs_markings,Damaged sign
+faded_lines,signs_markings,Faded pavement markings
+basin_blocked,drainage_stormwater,Blocked catch basin
+culvert_issue,drainage_stormwater,Culvert or ditching
+row_tree_limb,trees_row,Tree/limb in ROW
+plow_damage,snow_ice,Plow damage
+illegal_dump,litter_dumping,Illegal dumping
+mowing_trash,facilities_grounds,Mowing/trash at Town facility
+sewer_backup,sewer,Sewer backup/odor (route)
+```
+
+**dpw\_crews.csv**
+
+```
+id,label,lead,notify_email
+crew_roads,Roads Crew,John Smith,roads@suttonma.org
+crew_signs,Signs Crew,Jane Lee,signs@suttonma.org
+crew_drainage,Drainage Crew,Bob Kim,drainage@suttonma.org
+crew_trees,Tree/ROW Crew,Sara Patel,trees@suttonma.org
+crew_winter,Winter Ops,Alex Chen,winter@suttonma.org
+crew_facilities,Facilities Crew,Chris Roe,facilities@suttonma.org
+crew_sewer,Sewer Team (routing),Dispatch,sewer@suttonma.org
+```
+
+> Replace names/emails with Sutton’s actual contacts. Keep IDs stable.
+
+**dpw\_statuses.csv**
+
+```
+id,label,public
+received,Received,TRUE
+in_review,In Review,TRUE
+scheduled,Scheduled,TRUE
+in_progress,In Progress,TRUE
+on_hold,On Hold,TRUE
+completed,Completed,TRUE
+closed_no_action,Closed – No Action,TRUE
+```
+
+**dpw\_slas.csv**
+
+```
+category,target_first_update_days,target_close_days
+roads_sidewalks,3,15
+signs_markings,3,20
+drainage_stormwater,3,30
+trees_row,3,20
+snow_ice,1,5
+litter_dumping,3,10
+facilities_grounds,3,20
+sewer,1,5
+```
+
+**roads\_index.csv (optional seed)**
+
+```
+road_name,alias,route,district
+Central Turnpike,Central Tpk,RT,CENTER
+Boston Road,Boston Rd,RT,NORTH
+```
+
+> Import a proper street index from GIS/Assessor later.
+
+---
+
+## 4) Storage Model (SharePoint + OneDrive)
+
+### 4.1 Libraries & Lists
+
+**Libraries**
+
+* `/VAULT/Sutton/DPW/requests/` — resident intake packets, photos, comms.
+* `/VAULT/Sutton/DPW/work_orders/` — WOs, field sheets, closeout, costs.
+* `/VAULT/Sutton/DPW/reports/` — dashboards, monthly/seasonal reports, exports.
+
+**Lists** (key columns shown; use lowercase for internal names)
+
+* **dpw\_requests**
+
+  * `request_id` (Text, unique)
+  * `created_at` (DateTime, UTC)
+  * `category`, `subcategory` (Choice)
+  * `status` (Choice)
+  * `priority` (Choice: low/normal/high)
+  * `address`, `lat`, `lng` (Text/Number)
+  * `reporter_name`, `reporter_email`, `reporter_phone`
+  * `assignee_crew` (Choice)
+  * `work_order_id` (Lookup → dpw\_work\_orders)
+  * `due_date` (Date)
+  * `public_url` (Hyperlink)
+
+* **dpw\_work\_orders**
+
+  * `work_order_id` (Text, unique)
+  * `request_id` (Lookup → dpw\_requests)
+  * `scope` (Multiline)
+  * `scheduled_date` (Date)
+  * `crew` (Choice)
+  * `asset_id` (Text)
+  * `materials_cost`,`labor_hours`,`equipment_hours`,`other_costs` (Number)
+  * `closed_at` (DateTime)
+  * `closeout_note` (Multiline)
+
+* **dpw\_activity\_log**
+
+  * `work_order_id` (Lookup)
+  * `entry_ts` (DateTime)
+  * `entry_type` (Choice: labor/materials/equipment/note)
+  * `value_number` (Number) + `units` (Text)
+  * `entered_by` (Person)
+
+* **dpw\_assets** (optional now, future-proof)
+
+  * `asset_id`, `asset_type`, `location`, `condition`, `last_service_date`
+
+### 4.2 Folder & File Naming
+
+* Requests: `/VAULT/Sutton/DPW/requests/{fy}/{yyyy-mm}/{request_id}_{category}/`
+* Work Orders: `/VAULT/Sutton/DPW/work_orders/{fy}/{yyyy-mm}/{work_order_id}_{category}/`
+* Files within folders:
+
+  * `request_{request_id}_intake.json`
+  * `request_{request_id}_photos_{n}.jpg`
+  * `wo_{work_order_id}_field_sheet.pdf`
+  * `wo_{work_order_id}_closeout_form.pdf`
+
+---
+
+## 5) Power Automate (OPA) — Flow Suite
+
+### 5.1 **Intake Router** (trigger: CivicOptimize submission webhook → HTTP Request)
+
+1. **Parse JSON** — request payload.
+2. **Build IDs**:
+
+```
+request_id = concat('SUT-', utcNow('yyyyMMdd'), '-', substring(guid(),0,6))
+```
+
+3. **Crew Routing** — Switch on `category` → set `assignee_crew` from `dpw_crews` list.
+4. **Create Folder** — create request folder path above.
+5. **Save Intake Packet** — write JSON & any photos to folder.
+6. **Create List Item** — `dpw_requests` (set `status='received'`, calculate `due_date` from SLA).
+7. **Notify Resident (Acknowledgement Email)** — HTML template A.
+8. **Notify Crew Lead (Teams/Email)** — HTML template B + deep link to WO builder form.
+
+**Helper:** SLA due date
+
+```
+addDays(utcNow(), int(variables('target_close_days')))
+```
+
+### 5.2 **Work Order Builder** (trigger: manual/by crew lead, or auto on Intake)
+
+1. **Get Request** → initialize `work_order_id`
+
+```
+work_order_id = concat('SUT-WO-', utcNow('yyyyMMdd'), '-', substring(guid(),0,5))
+```
+
+2. **Create WO Item** in `dpw_work_orders` with scope stub and scheduled date.
+3. **Relate**: update `dpw_requests.work_order_id` and set `status='scheduled'`.
+4. **Generate Field Sheet (HTML → PDF)** — save into WO folder.
+5. **Notify Crew** — assignment email/Teams card with one-click status updates links.
+
+### 5.3 **Update & Notify** (trigger: SharePoint item change)
+
+* If `status` changes → post resident-friendly update (email) and update the public request page.
+* If `scheduled_date` within 24h → reminder to crew.
+
+### 5.4 **Closeout & Survey**
+
+* When crew sets `status='completed'`: prompt for closeout note, photos, materials/labor.
+* Create closeout PDF; email resident a **3-question survey** (thumbs + comment).
+
+### 5.5 **SLA Watchdog** (recurrence)
+
+* Daily query for items where `status ∈ {received,in_review,scheduled}` and `due_date < today()`.
+* Escalate to DPW Director & Town Manager list; write exception log.
+
+### 5.6 **GIS Map Drop (optional)**
+
+* Build GeoJSON from lat/lng + status; drop to `/reports/geo/requests.geojson` for web map embedding.
+
+---
+
+## 6) Email & Teams Templates (HTML)
+
+### Template A — Resident Acknowledgement
+
+```html
+<div style="font-family:Segoe UI,Arial,sans-serif;color:#0f3d2e">
+  <h2 style="margin:0 0 8px">We got your report — Thank you!</h2>
+  <p>Request <strong>{{request_id}}</strong> — <em>{{category_label}}</em></p>
+  <p>We’ll review and update you soon. You can check your status here:
+    <a href="{{public_url}}">View my request</a>.</p>
+  <hr>
+  <small>This message may be a public record. Do not include sensitive information.</small>
+</div>
+```
+
+### Template B — Crew Assignment (email/Teams)
+
+```html
+<div style="font-family:Segoe UI,Arial,sans-serif">
+  <h3 style="margin:0 0 4px">New Assignment: {{category_label}}</h3>
+  <p><strong>WO:</strong> {{work_order_id}} | <strong>Req:</strong> {{request_id}}</p>
+  <p><strong>When:</strong> {{scheduled_date}} | <strong>Where:</strong> {{address}}</p>
+  <p>{{scope}}</p>
+  <p>
+    <a href="{{one_click_in_progress}}">Start</a> ·
+    <a href="{{one_click_on_hold}}">Hold</a> ·
+    <a href="{{one_click_complete}}">Complete</a>
+  </p>
+</div>
+```
+
+### Template C — Completion to Resident
+
+```html
+<div style="font-family:Segoe UI,Arial,sans-serif">
+  <h3 style="margin:0 0 4px">Request {{request_id}} completed</h3>
+  <p>{{closeout_note}}</p>
+  <p>How did we do? <a href="{{survey_url}}">Quick survey</a></p>
+</div>
+```
+
+---
+
+## 7) CivicPlus Page — **SuttonFIX** (HTML skeleton)
+
+```html
+<section class="suttonfix" aria-label="Report an issue">
+  <div class="hero">
+    <h1>SuttonFIX — Report an Issue</h1>
+    <p>Tell us what you’re seeing. We’ll route it to the right team.</p>
+  </div>
+  <div class="cards">
+    <a class="card" href="#form?category=roads_sidewalks">Roads & Sidewalks</a>
+    <a class="card" href="#form?category=trees_row">Trees & Vegetation</a>
+    <a class="card" href="#form?category=signs_markings">Signs & Markings</a>
+    <a class="card" href="#form?category=drainage_stormwater">Drainage & Stormwater</a>
+    <a class="card" href="#form?category=litter_dumping">Litter & Dumping</a>
+    <a class="card" href="#form?category=sewer">Sewer</a>
+  </div>
+
+  <div id="form">
+    <!-- CivicOptimize embed: replace with your form embed code -->
+    <iframe title="SuttonFIX Request Form" src="https://YOUR-CO-FORM-URL" width="100%" height="1100" style="border:0"></iframe>
+  </div>
+
+  <details class="kb"><summary>Before you report…</summary>
+    <ul>
+      <li>After-hours emergencies: call non-emergency police dispatch.</li>
+      <li>Pothole damage claims follow Massachusetts law; see the Town’s guidance.</li>
+      <li>Trash/recycling: if private hauler, contact your provider.</li>
+    </ul>
+  </details>
+</section>
+<style>
+.suttonfix .hero{padding:1rem 0}
+.suttonfix .cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:1rem 0}
+.suttonfix .card{display:block;padding:14px;border:1px solid #e5e7eb;border-radius:10px;text-decoration:none}
+.suttonfix .kb{margin-top:1rem}
+</style>
+```
+
+---
+
+## 8) Supervisor Views (CivicOptimize)
+
+* **Triage View** — last 72 hours, unassigned, high priority first.
+* **Crew Board** — Kanban by `status` for each crew.
+* **Map View** — show open requests color-coded by status (GeoJSON).
+* **Seasonal View** — leaf/brush, winter operations, line striping.
+
+---
+
+## 9) Permissions (Role Matrix)
+
+* **Resident** — submit/lookup own requests.
+* **Intake Clerk** — triage, merge duplicates, assign crew.
+* **Crew Lead** — create WOs, schedule, update status, closeout.
+* **DPW Director** — full access, SLA overrides, reporting.
+* **Town Manager** — read-only analytics and escalations.
+* **Records/Clerk** — export/retention tasks, public records responses.
+
+---
+
+## 10) Implementation Phases (No-duration "+" steps)
+
+* **Phase 0 – Prep**: provision SharePoint libs/lists; create dynamic lists; set retention labels; confirm categories.
+* **Phase 1 – Intake**: build CivicOptimize form; webhook to OPA; emails; resident page embed.
+* **Phase 2 – WO Core**: WO builder; field sheet PDF; crew notifications; basic dashboard.
+* **Phase 3 – Closeout**: survey; SLA watchdog; exports; seasonal views; GIS drop.
+* **Phase 4 – Expand**: assets table; cemeteries/parks (if applicable); Laserfiche archival.
+
+---
+
+## 11) Metrics & Reporting
+
+* Volume by category, by month
+* First-response time & % within target
+* Time-to-close & % within target
+* Open backlog over time
+* Crew workload distribution
+* Hotspots (map density)
+* Repeat request locations
+* Winter ops: events, lane-miles treated, material usage
+* Sign maintenance cycles
+* Drainage maintenance schedule coverage
+* Resident satisfaction (survey rating)
+* Exception/overdue log
+
+---
+
+## 12) Records & Compliance Notes
+
+* Public records notice on intake; strip PII from public-facing listings.
+* Retention: follow MA schedules; set SharePoint labels (e.g., 7–10 years typical; confirm with Records Officer).
+* Pothole damage claims: link to state guidance and local claim process.
+* After-hours routing banner displayed during storms.
+
+---
+
+## 13) Branding (Sutton)
+
+* Use Town seal and a green/black/gold palette derived from the seal.
+* Button style: rounded, high-contrast, WCAG AA.
+* Voice & tone: plain-language, friendly, “here’s what to expect.”
+
+---
+
+## 14) Admin Checklist (Go-Live)
+
+* [ ] Categories & crews validated by DPW Director
+* [ ] Address/road index imported
+* [ ] Form tested on mobile in field
+* [ ] SLA targets tuned by season
+* [ ] Sign-off from Town Manager & Clerk on records/retention
+* [ ] Public page QA by Communications
+
+---
+
+## 15) Appendix A — Power Automate Snippets
+
+**Slugify for safe folder names**
+
+```
+replace(replace(replace(toLower(variables('rawName')),' ','-'),'/','-'),'#','')
+```
+
+**One-click status links (HTTP-triggered flow)**
+`https://flow-url/api/update?request_id={{request_id}}&status=in_progress`
+
+**GeoJSON feature**
+
+```json
+{
+  "type":"Feature",
+  "properties":{
+    "request_id":"{{request_id}}",
+    "status":"{{status}}",
+    "category":"{{category}}"
+  },
+  "geometry":{"type":"Point","coordinates":[{{lng}},{{lat}}]}
+}
+```
+
+---
+
+## 16) Appendix B — Closeout PDF (HTML → PDF outline)
+
+```
+Town of Sutton — DPW Closeout
+Request: {{request_id}}  |  Work Order: {{work_order_id}}
+Location: {{address}} ({{lat}},{{lng}})
+Category: {{category_label}} / {{subcategory_label}}
+Crew: {{crew}}  |  Scheduled: {{scheduled_date}}  |  Closed: {{closed_at}}
+
+Summary:
+{{closeout_note}}
+
+Labor Hours: {{labor_hours}} | Equipment Hours: {{equipment_hours}} | Materials: ${{materials_cost}}
+Attachments: photos (n={{photo_count}})
+Signed by: {{entered_by}} (name), {{entry_ts}}
+```
+
+---
+
+## 17) Appendix C — Data Dictionary (selected)
+
+* `request_id` — stable unique ID for public references.
+* `work_order_id` — internal WO ID; can be shared.
+* `status` — request lifecycle; mirrored to resident view.
+* `crew` — assignment group; not a single person.
+* `due_date` — SLA target; used for watchdog.
+* `public_url` — public status page; hides reporter PII.
+
+---
+
+### Ready-to-Build Summary
+
+1. Import CSV seeds as CivicOptimize dynamic lists.
+2. Build the intake form exactly as schema (3.1).
+3. Stand up SharePoint lists/libs (4).
+4. Configure the four core OPA flows (5).
+5. Publish the CivicPlus page (7) and test end‑to‑end on mobile.
+6. Tune SLAs, categories, and supervisor views over the first month of use.
