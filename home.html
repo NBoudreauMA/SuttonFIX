@@ -1,1381 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuttonFIX - Report an Issue | Town of Sutton, MA</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --sutton-green: #0f3d2e;
-            --sutton-gold: #d4af37;
-            --sutton-light-green: #2d5a45;
-            --bg-light: #f8faf9;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --white: #ffffff;
-            --red: #dc2626;
-            --blue: #2563eb;
-            --yellow: #f59e0b;
-        }
-
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background: var(--bg-light);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        header {
-            background: var(--sutton-green);
-            color: var(--white);
-            padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .town-seal {
-            width: 50px;
-            height: 50px;
-            background: var(--sutton-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--sutton-green);
-            font-size: 18px;
-        }
-
-        .site-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--white);
-        }
-
-        .site-subtitle {
-            color: rgba(255,255,255,0.8);
-            font-size: 0.9rem;
-            margin-top: -5px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-link {
-            color: var(--white);
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        /* Main Content */
-        main {
-            padding: 2rem 0;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 2rem 0;
-            background: var(--white);
-            border-radius: 15px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            color: var(--sutton-green);
-            margin-bottom: 0.5rem;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .alert-banner {
-            background: linear-gradient(135deg, var(--yellow), #fbbf24);
-            color: var(--text-primary);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 1rem 0;
-            display: none;
-        }
-
-        .alert-banner.active {
-            display: block;
-        }
-
-        /* Category Cards */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin: 2rem 0;
-        }
-
-        .category-card {
-            background: var(--white);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-decoration: none;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .category-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(15, 61, 46, 0.15);
-            border-color: var(--sutton-green);
-        }
-
-        .category-card h3 {
-            color: var(--sutton-green);
-            margin-bottom: 0.5rem;
-            font-size: 1.3rem;
-        }
-
-        .category-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .category-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--sutton-light-green);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        /* Form Section */
-        .form-section {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .form-section.active {
-            display: block;
-        }
-
-        .form-header {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--sutton-gold);
-        }
-
-        .form-header h2 {
-            color: var(--sutton-green);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--sutton-green);
-        }
-
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .location-options {
-            display: flex;
-            gap: 1rem;
-            margin: 0.5rem 0;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .priority-selector {
-            display: flex;
-            gap: 1rem;
-            margin: 0.5rem 0;
-        }
-
-        .priority-option {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .priority-option.low {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .priority-option.normal {
-            border-color: var(--yellow);
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .priority-option.high {
-            border-color: var(--red);
-            background: rgba(220, 38, 38, 0.1);
-        }
-
-        .priority-option.selected {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .file-upload {
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            transition: border-color 0.3s;
-            cursor: pointer;
-        }
-
-        .file-upload:hover {
-            border-color: var(--sutton-green);
-        }
-
-        .file-upload.dragover {
-            border-color: var(--sutton-green);
-            background: rgba(15, 61, 46, 0.05);
-        }
-
-        .photo-preview {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .photo-item {
-            position: relative;
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid var(--border-color);
-        }
-
-        .photo-remove {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 24px;
-            height: 24px;
-            background: var(--red);
-            color: var(--white);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-            margin-top: 2px;
-        }
-
-        .btn {
-            background: var(--sutton-green);
-            color: var(--white);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn:hover {
-            background: var(--sutton-light-green);
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--text-secondary);
-            color: var(--white);
-        }
-
-        /* Knowledge Base */
-        .knowledge-base {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .kb-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .kb-item {
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-light);
-        }
-
-        .kb-item h4 {
-            color: var(--sutton-green);
-            margin-bottom: 0.5rem;
-        }
-
-        /* Status Lookup */
-        .lookup-section {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .lookup-section.active {
-            display: block;
-        }
-
-        .status-result {
-            background: var(--bg-light);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-            border-left: 4px solid var(--sutton-green);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-received { background: #e0e7ff; color: #3730a3; }
-        .status-in-review { background: #fef3c7; color: #92400e; }
-        .status-scheduled { background: #dbeafe; color: #1e40af; }
-        .status-in-progress { background: #ecfdf5; color: #065f46; }
-        .status-on-hold { background: #fecaca; color: #991b1b; }
-        .status-completed { background: #d1fae5; color: #047857; }
-
-        /* Footer */
-        footer {
-            background: var(--sutton-green);
-            color: var(--white);
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h4 {
-            color: var(--sutton-gold);
-            margin-bottom: 1rem;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-        }
-
-        .footer-section a:hover {
-            color: var(--white);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .priority-selector,
-            .location-options {
-                flex-direction: column;
-            }
-
-            .nav-links {
-                display: none;
-            }
-        }
-
-        /* Loading and Success States */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .success-message {
-            background: #d1fae5;
-            color: #047857;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            border: 1px solid #a7f3d0;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            border: 1px solid #fecaca;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SuttonFIX — Report an Issue</title>
+<meta name="description" content="Report an issue to the Town of Sutton DPW. Route to the right crew and get status updates." />
+<style>
+  :root{
+    --pl-green:#2e7d32; --pl-green-dark:#1b5e20; --ink:#0e1116; --muted:#5a6a72; --bg:#f7f8f9; --card:#ffffff; --warn:#b71c1c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:980px;margin:0 auto;padding:24px}
+  header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+  header img{width:64px;height:64px;object-fit:contain}
+  h1{font-size:1.9rem;margin:.1em 0}
+  .card{background:var(--card);border:1px solid #e5e8eb;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.04);padding:18px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid-1{grid-template-columns:1fr}
+  label{display:block;font-weight:600;margin:8px 0 6px}
+  input[type="text"],input[type="email"],input[type="tel"],input[type="file"],select,textarea{
+    width:100%;padding:10px 12px;border:1px solid #ced4da;border-radius:10px;background:#fff;font:inherit
+  }
+  textarea{min-height:110px;resize:vertical}
+  .hint{color:var(--muted);font-size:.9rem}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{appearance:none;border:1px solid var(--pl-green-dark);background:var(--pl-green);color:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:600}
+  .btn.secondary{background:#fff;color:var(--pl-green-dark)}
+  .btn:disabled{opacity:.65;cursor:not-allowed}
+  details{margin:10px 0 18px}
+  summary{font-weight:600;cursor:pointer}
+  .status{margin-top:12px;padding:12px 14px;border-radius:10px;display:none}
+  .ok{display:block;background:#e8f5e9;border:1px solid #c8e6c9}
+  .err{display:block;background:#ffebee;border:1px solid #ffcdd2;color:var(--warn)}
+  footer{margin:18px 4px;color:var(--muted);font-size:.95rem}
+  .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+  .pill{padding:8px 10px;border-radius:999px;border:1px solid var(--pl-green-dark);color:#fff;background:var(--pl-green);text-decoration:none;font-size:.92rem}
+  .pill:focus,.pill:hover{background:var(--pl-green-dark)}
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} header{flex-direction:row} }
+</style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="town-seal">S</div>
-                    <div>
-                        <div class="site-title">SuttonFIX</div>
-                        <div class="site-subtitle">Town of Sutton, Massachusetts</div>
-                    </div>
-                </div>
-                <nav class="nav-links">
-                    <a href="#home" class="nav-link">Home</a>
-                    <a href="#report" class="nav-link">Report Issue</a>
-                    <a href="#lookup" class="nav-link">Check Status</a>
-                    <a href="#knowledge" class="nav-link">Help</a>
-                </nav>
-            </div>
+<div class="wrap">
+
+  <header class="row">
+    <!-- If you swap the seal URL, keep the same id -->
+    <img id="seal" alt="Town of Sutton seal" src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Seal_of_Sutton%2C_Massachusetts.png" />
+    <div>
+      <h1>SuttonFIX</h1>
+      <div class="hint">Report an issue. We’ll route it to the right crew and keep you posted.</div>
+    </div>
+  </header>
+
+  <!-- Quick-pick categories (prefills the select) -->
+  <nav class="pillbar" aria-label="Common categories">
+    <a class="pill" href="?category=roads_sidewalks">Roads &amp; Sidewalks</a>
+    <a class="pill" href="?category=trees_row">Trees &amp; Vegetation</a>
+    <a class="pill" href="?category=signs_markings">Signs &amp; Markings</a>
+    <a class="pill" href="?category=drainage_stormwater">Drainage &amp; Stormwater</a>
+    <a class="pill" href="?category=litter_dumping">Litter &amp; Dumping</a>
+    <a class="pill" href="?category=sewer">Sewer</a>
+  </nav>
+
+  <details class="card">
+    <summary>Before you report (quick tips)</summary>
+    <ul>
+      <li>Downed lines? Call 911 or your utility first.</li>
+      <li>After-hours storm issues: submit here; crews triage by safety first.</li>
+      <li>Photos help. Add a landmark if no street number exists.</li>
+    </ul>
+  </details>
+
+  <form id="sf" class="card" novalidate>
+    <div class="grid">
+      <div>
+        <label for="category">Category *</label>
+        <select id="category" name="category" required>
+          <option value="">Choose…</option>
+          <option value="roads_sidewalks">Roads &amp; Sidewalks</option>
+          <option value="trees_row">Trees &amp; Vegetation (ROW)</option>
+          <option value="signs_markings">Signs &amp; Markings</option>
+          <option value="drainage_stormwater">Drainage &amp; Stormwater</option>
+          <option value="snow_ice">Snow &amp; Ice</option>
+          <option value="litter_dumping">Litter &amp; Illegal Dumping</option>
+          <option value="facilities_grounds">Facilities &amp; Grounds</option>
+          <option value="sewer">Sewer (routing)</option>
+        </select>
+      </div>
+      <div>
+        <label for="subcategory">Subcategory (optional)</label>
+        <input id="subcategory" name="subcategory" type="text" placeholder="e.g., Pothole, Missing sign, Blocked basin" />
+      </div>
+    </div>
+
+    <label for="description">Describe the issue *</label>
+    <textarea id="description" name="description" minlength="12" required placeholder="What’s happening? Include landmarks, direction of travel, etc."></textarea>
+
+    <div class="grid">
+      <div>
+        <label for="address">Street address or nearest landmark</label>
+        <input id="address" name="address" type="text" placeholder="123 Main St or ‘near ballfield gate’" />
+      </div>
+      <div>
+        <label>GPS (optional)</label>
+        <div class="row">
+          <input id="lat" name="lat" type="text" inputmode="decimal" placeholder="lat" style="max-width:46%" />
+          <input id="lng" name="lng" type="text" inputmode="decimal" placeholder="lng" style="max-width:46%" />
+          <button id="geo" type="button" class="btn secondary">Use my location</button>
         </div>
-    </header>
+        <div class="hint">Using GPS is optional but helpful for pinpointing.</div>
+      </div>
+    </div>
 
-    <main class="container">
-        <!-- Home Section -->
-        <section id="home-section">
-            <div class="hero">
-                <h1>Report an Issue</h1>
-                <p>Tell us what you're seeing. We'll route it to the right team and keep you updated.</p>
-                
-                <div class="alert-banner" id="weather-alert">
-                    <strong>Winter Weather Alert:</strong> Due to the ongoing storm, response times may be extended. For emergencies, call 911.
-                </div>
-            </div>
+    <div class="grid">
+      <div>
+        <label for="reporter_name">Your name *</label>
+        <input id="reporter_name" name="reporter_name" type="text" required />
+      </div>
+      <div>
+        <label for="reporter_email">Email *</label>
+        <input id="reporter_email" name="reporter_email" type="email" required />
+      </div>
+    </div>
 
-            <div class="category-grid">
-                <a href="#" class="category-card" data-category="roads_sidewalks">
-                    <div class="category-icon">🛣️</div>
-                    <h3>Roads & Sidewalks</h3>
-                    <p>Potholes, sidewalk hazards, curb damage, pavement issues</p>
-                </a>
+    <div class="grid">
+      <div>
+        <label for="reporter_phone">Phone (optional)</label>
+        <input id="reporter_phone" name="reporter_phone" type="tel" />
+      </div>
+      <div>
+        <label for="priority_hint">Priority</label>
+        <select id="priority_hint" name="priority_hint">
+          <option value="normal">Normal</option>
+          <option value="high">High (safety-related)</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
 
-                <a href="#" class="category-card" data-category="trees_row">
-                    <div class="category-icon">🌳</div>
-                    <h3>Trees & Vegetation</h3>
-                    <p>Fallen trees, hanging limbs, vegetation blocking visibility</p>
-                </a>
+    <label for="photo">Photo(s) (optional)</label>
+    <input id="photo" name="photo" type="file" accept="image/*" multiple />
 
-                <a href="#" class="category-card" data-category="signs_markings">
-                    <div class="category-icon">🚏</div>
-                    <h3>Signs & Markings</h3>
-                    <p>Missing signs, damaged signs, faded pavement markings</p>
-                </a>
+    <div class="hint" style="margin:8px 0 14px">
+      By submitting, you understand this submission may be a public record. Please avoid sensitive information.
+    </div>
 
-                <a href="#" class="category-card" data-category="drainage_stormwater">
-                    <div class="category-icon">🌊</div>
-                    <h3>Drainage & Stormwater</h3>
-                    <p>Blocked catch basins, flooding, culvert issues</p>
-                </a>
+    <div class="row">
+      <button class="btn" id="submit">Submit report</button>
+      <button class="btn secondary" type="reset">Reset</button>
+      <div id="spinner" class="hint" aria-live="polite" style="display:none">Submitting…</div>
+    </div>
 
-                <a href="#" class="category-card" data-category="snow_ice">
-                    <div class="category-icon">❄️</div>
-                    <h3>Snow & Ice</h3>
-                    <p>Plow damage, ice hazards, snow removal requests</p>
-                </a>
+    <div id="ok" class="status ok" role="status">Thanks! We received your report. Check your email for a confirmation.</div>
+    <div id="err" class="status err" role="alert">Sorry, something went wrong. Please try again in a minute.</div>
+  </form>
 
-                <a href="#" class="category-card" data-category="litter_dumping">
-                    <div class="category-icon">🗑️</div>
-                    <h3>Litter & Illegal Dumping</h3>
-                    <p>Illegal dumping, excessive litter, cleanup needed</p>
-                </a>
+  <footer>
+    Town of Sutton • 4 Uxbridge Road, Sutton, MA 01590 • (508) 917-7000
+  </footer>
+</div>
 
-                <a href="#" class="category-card" data-category="facilities_grounds">
-                    <div class="category-icon">🏛️</div>
-                    <h3>Town Facilities</h3>
-                    <p>Town building grounds, common areas, maintenance issues</p>
-                </a>
+<script>
+/* ======= CONFIG ======= */
+// Replace with your Apps Script web app endpoint (doPost)
+const GAS_ENDPOINT = 'https://script.google.com/macros/s/YOUR-DEPLOYMENT-ID/exec';
 
-                <a href="#" class="category-card" data-category="sewer">
-                    <div class="category-icon">🔧</div>
-                    <h3>Sewer</h3>
-                    <p>Sewer backups, odors, manholes (routed to Sewer Dept)</p>
-                </a>
-            </div>
-        </section>
+/* ======= Prefill category from URL ======= */
+(function prefill(){
+  const p = new URLSearchParams(location.search);
+  const cat = p.get('category');
+  if(cat){ const sel = document.getElementById('category'); if(sel) sel.value = cat; }
+})();
 
-        <!-- Report Form Section -->
-        <section id="report-section" class="form-section">
-            <div class="form-header">
-                <h2>Report an Issue</h2>
-                <p>Please provide as much detail as possible to help us address your concern quickly.</p>
-            </div>
+/* ======= Geolocation helper ======= */
+document.getElementById('geo').addEventListener('click', async () => {
+  try{
+    if(!navigator.geolocation) return alert('Geolocation not supported on this device/browser.');
+    document.getElementById('geo').disabled = true;
+    navigator.geolocation.getCurrentPosition(pos=>{
+      document.getElementById('lat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('lng').value = pos.coords.longitude.toFixed(6);
+      document.getElementById('geo').disabled = false;
+    }, err=>{
+      alert('Could not get location: ' + err.message);
+      document.getElementById('geo').disabled = false;
+    }, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+  }catch(e){ console.error(e); }
+});
 
-            <form id="issue-form">
-                <div class="form-group">
-                    <label for="category">Issue Category *</label>
-                    <select id="category" name="category" required>
-                        <option value="">Select a category</option>
-                        <option value="roads_sidewalks">Roads & Sidewalks</option>
-                        <option value="trees_row">Trees & Vegetation (ROW)</option>
-                        <option value="signs_markings">Signs & Markings</option>
-                        <option value="drainage_stormwater">Drainage & Stormwater</option>
-                        <option value="snow_ice">Snow & Ice</option>
-                        <option value="litter_dumping">Litter & Illegal Dumping</option>
-                        <option value="facilities_grounds">Town Facilities & Grounds</option>
-                        <option value="sewer">Sewer (Routing)</option>
-                    </select>
-                </div>
+/* ======= Submit handler ======= */
+document.getElementById('sf').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const form = e.currentTarget;
+  const spinner = document.getElementById('spinner');
+  const ok = document.getElementById('ok');
+  const err = document.getElementById('err');
+  ok.style.display = 'none'; err.style.display = 'none';
 
-                <div class="form-group">
-                    <label for="subcategory">Specific Issue</label>
-                    <select id="subcategory" name="subcategory">
-                        <option value="">Select specific issue (optional)</option>
-                    </select>
-                </div>
+  if(!form.reporter_email.value || !form.reporter_name.value || !form.description.value || !form.category.value){
+    err.textContent = 'Please complete the required fields (Category, Description, Name, Email).';
+    err.style.display = 'block'; return;
+  }
 
-                <div class="form-group">
-                    <label for="description">Description *</label>
-                    <textarea id="description" name="description" required minlength="12" 
-                        placeholder="Please describe the issue in detail. Include any relevant information that would help our crew understand and address the problem."></textarea>
-                </div>
+  // Build payload
+  const payload = {
+    category: form.category.value,
+    subcategory: form.subcategory.value.trim(),
+    description: form.description.value.trim(),
+    address: form.address.value.trim(),
+    lat: form.lat.value.trim(),
+    lng: form.lng.value.trim(),
+    reporter_name: form.reporter_name.value.trim(),
+    reporter_email: form.reporter_email.value.trim(),
+    reporter_phone: form.reporter_phone.value.trim(),
+    priority_hint: form.priority_hint.value
+  };
 
-                <div class="form-group">
-                    <label>Location Type *</label>
-                    <div class="location-options">
-                        <label class="radio-option">
-                            <input type="radio" name="location_type" value="address" required>
-                            Street Address
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="location_type" value="intersection" required>
-                            Intersection
-                        </label>
-                    </div>
-                </div>
+  // Optional photos -> base64 (kept simple; consider size limits)
+  const files = Array.from(form.photo.files || []);
+  if(files.length){
+    payload.photos = [];
+    for(const f of files.slice(0,6)){
+      const b64 = await fileToBase64(f);
+      payload.photos.push({name:f.name, type:f.type, data:b64});
+    }
+  }
 
-                <div id="address-fields" class="form-group" style="display: none;">
-                    <label for="address">Street Address or Nearest Landmark *</label>
-                    <input type="text" id="address" name="address" 
-                        placeholder="123 Main Street or 'Near the library on Central Turnpike'">
-                </div>
+  spinner.style.display = 'inline';
+  try{
+    const res = await fetch(GAS_ENDPOINT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=> ({}));
+    spinner.style.display = 'none';
+    if(res.ok && data.ok){
+      ok.style.display = 'block';
+      form.reset();
+      // preserve selected category in case user wants to file another
+      const cat = payload.category;
+      document.getElementById('category').value = cat;
+    }else{
+      err.textContent = 'Submission failed. Please try again shortly.';
+      err.style.display = 'block';
+    }
+  }catch(ex){
+    spinner.style.display = 'none';
+    err.textContent = 'Network error. Please try again.';
+    err.style.display = 'block';
+  }
+});
 
-                <div id="intersection-fields" style="display: none;">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="intersection_primary">Primary Street *</label>
-                            <input type="text" id="intersection_primary" name="intersection_primary" 
-                                placeholder="Main Street">
-                        </div>
-                        <div class="form-group">
-                            <label for="intersection_cross">Cross Street *</label>
-                            <input type="text" id="intersection_cross" name="intersection_cross" 
-                                placeholder="Central Turnpike">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Photos (up to 6)</label>
-                    <div class="file-upload" id="photo-upload">
-                        <p>📷 Drag and drop photos here, or click to select files</p>
-                        <p><small>JPG, PNG, or HEIC files only</small></p>
-                        <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
-                    </div>
-                    <div id="photo-preview" class="photo-preview"></div>
-                </div>
-
-                <div class="form-group">
-                    <label>Priority Level</label>
-                    <div class="priority-selector">
-                        <div class="priority-option low" data-priority="low">
-                            <strong>Low</strong><br>
-                            <small>Not urgent</small>
-                        </div>
-                        <div class="priority-option normal selected" data-priority="normal">
-                            <strong>Normal</strong><br>
-                            <small>Standard priority</small>
-                        </div>
-                        <div class="priority-option high" data-priority="high">
-                            <strong>High</strong><br>
-                            <small>Safety concern</small>
-                        </div>
-                    </div>
-                    <input type="hidden" id="priority" name="priority" value="normal">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="reporter_name">Your Name *</label>
-                        <input type="text" id="reporter_name" name="reporter_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reporter_email">Email Address *</label>
-                        <input type="email" id="reporter_email" name="reporter_email" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="reporter_phone">Phone Number (optional)</label>
-                        <input type="tel" id="reporter_phone" name="reporter_phone">
-                    </div>
-                    <div class="form-group">
-                        <label for="preferred_contact">Preferred Contact Method</label>
-                        <select id="preferred_contact" name="preferred_contact">
-                            <option value="email">Email</option>
-                            <option value="phone">Phone</option>
-                            <option value="no_updates">No updates needed</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="privacy_ack" name="privacy_ack" required>
-                    <label for="privacy_ack">I understand my submission is a public record subject to disclosure under Massachusetts Public Records Law.</label>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="consent_contact" name="consent_contact" required>
-                    <label for="consent_contact">The Town may contact me about this request for additional information or updates.</label>
-                </div>
-
-                <div class="success-message" id="success-message">
-                    <h4>✅ Request Submitted Successfully!</h4>
-                    <p>Your request ID is: <strong id="request-id-display"></strong></p>
-                    <p>We'll review your request and update you within 3 business days. You can check the status using the link above.</p>
-                </div>
-
-                <div class="error-message" id="error-message">
-                    <h4>❌ Submission Failed</h4>
-                    <p id="error-details">Please check your information and try again.</p>
-                </div>
-
-                <button type="submit" class="btn" id="submit-btn">
-                    <span id="submit-text">Submit Request</span>
-                    <span class="loading" id="submit-loading" style="display: none;"></span>
-                </button>
-                
-                <button type="button" class="btn btn-secondary" onclick="showSection('home')">
-                    ← Back to Categories
-                </button>
-            </form>
-        </section>
-
-        <!-- Status Lookup Section -->
-        <section id="lookup-section" class="lookup-section">
-            <div class="form-header">
-                <h2>Check Request Status</h2>
-                <p>Enter your email and request ID to check the status of your submission.</p>
-            </div>
-
-            <form id="lookup-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="lookup_email">Email Address *</label>
-                        <input type="email" id="lookup_email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lookup_id">Request ID *</label>
-                        <input type="text" id="lookup_id" required placeholder="SUT-20250826-ABC123">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn">Look Up Status</button>
-            </form>
-
-            <div id="status-result" class="status-result" style="display: none;">
-                <h3>Request Status</h3>
-                <div id="status-details"></div>
-            </div>
-        </section>
-
-        <!-- Knowledge Base Section -->
-        <section id="knowledge-section" class="knowledge-base" style="display: none;">
-            <h2>Before You Report...</h2>
-            <p>Check here first - your issue might already be addressed or scheduled.</p>
-
-            <div class="kb-grid">
-                <div class="kb-item">
-                    <h4>🚨 After-Hours Emergencies</h4>
-                    <p>For immediate safety hazards (gas leaks, downed wires, major flooding), call 911 or non-emergency dispatch at (508) 555-0123.</p>
-                </div>
-
-                <div class="kb-item">
-                    <h4>🕳️ Pothole Claims</h4>
-                    <p>Damage claims follow Massachusetts law. The Town must have prior notice of the defect. See our claims process on the Town website.</p>
-                </div>
-
-                <div class="kb-item">
-                    <h4>🗑️ Trash & Recycling</h4>
-                    <p>If you have private waste collection, contact your hauler directly. Town pickup is only for Town buildings and some common areas.</p>
-                </div>
-
-                <div class="kb-item">
-                    <h4>❄️ Snow Operations</h4>
-                    <p>We prioritize main roads, schools, and emergency routes. Residential streets are plowed after storm completion. Mailbox damage reports accepted after storms end.</p>
-                </div>
-
-                <div class="kb-item">
-                    <h4>🌳 Tree Issues</h4>
-                    <p>We only address trees in the public right-of-way. Trees on private property are the owner's responsibility, even if they affect Town infrastructure.</p>
-                </div>
-
-                <div class="kb-item">
-                    <h4>🚏 Sign Maintenance</h4>
-                    <p>Stop signs, street signs, and regulatory signs are prioritized by safety impact. Decorative or non-essential signs may have longer response times.</p>
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-light); border-radius: 10px;">
-                <h4>📞 Need to speak with someone?</h4>
-                <p><strong>DPW Office:</strong> (508) 555-0100 (Monday-Friday, 7:00 AM - 3:30 PM)<br>
-                <strong>Town Hall:</strong> (508) 555-0200 (Monday-Friday, 8:00 AM - 4:00 PM)</p>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Town of Sutton</h4>
-                    <p>4 Uxbridge Road<br>
-                    Sutton, MA 01590<br>
-                    <a href="tel:508-555-0200">(508) 555-0200</a></p>
-                </div>
-                <div class="footer-section">
-                    <h4>Department of Public Works</h4>
-                    <p>Monday - Friday: 7:00 AM - 3:30 PM<br>
-                    <a href="tel:508-555-0100">(508) 555-0100</a><br>
-                    <a href="mailto:dpw@suttonma.org">dpw@suttonma.org</a></p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <p>
-                        <a href="https://suttonma.org">Town Website</a><br>
-                        <a href="#home">Report an Issue</a><br>
-                        <a href="#lookup">Check Status</a><br>
-                        <a href="https://suttonma.org/emergency">Emergency Info</a>
-                    </p>
-                </div>
-            </div>
-            <p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
-                © 2025 Town of Sutton, Massachusetts. Built with VAULT™ Framework.
-            </p>
-        </div>
-    </footer>
-
-    <script>
-        // Application State
-        const appState = {
-            currentSection: 'home',
-            selectedCategory: null,
-            uploadedPhotos: [],
-            selectedPriority: 'normal',
-            subcategoryMap: {
-                'roads_sidewalks': [
-                    { value: 'pothole', label: 'Pothole' },
-                    { value: 'sidewalk_hazard', label: 'Sidewalk hazard' },
-                    { value: 'curb_damage', label: 'Curb damage' },
-                    { value: 'pavement_crack', label: 'Pavement cracking' }
-                ],
-                'signs_markings': [
-                    { value: 'missing_sign', label: 'Missing sign' },
-                    { value: 'damaged_sign', label: 'Damaged sign' },
-                    { value: 'faded_lines', label: 'Faded pavement markings' },
-                    { value: 'sign_obstruct', label: 'Sign obstruction' }
-                ],
-                'drainage_stormwater': [
-                    { value: 'basin_blocked', label: 'Blocked catch basin' },
-                    { value: 'culvert_issue', label: 'Culvert or ditching' },
-                    { value: 'flooding', label: 'Flooding/poor drainage' },
-                    { value: 'erosion', label: 'Erosion issues' }
-                ],
-                'trees_row': [
-                    { value: 'row_tree_limb', label: 'Tree/limb in ROW' },
-                    { value: 'fallen_tree', label: 'Fallen tree' },
-                    { value: 'visibility_issue', label: 'Visibility obstruction' },
-                    { value: 'dead_tree', label: 'Dead/dangerous tree' }
-                ],
-                'snow_ice': [
-                    { value: 'plow_damage', label: 'Plow damage' },
-                    { value: 'ice_hazard', label: 'Ice hazard' },
-                    { value: 'mailbox_damage', label: 'Mailbox damage' },
-                    { value: 'snow_removal', label: 'Snow removal request' }
-                ],
-                'litter_dumping': [
-                    { value: 'illegal_dump', label: 'Illegal dumping' },
-                    { value: 'excessive_litter', label: 'Excessive litter' },
-                    { value: 'cleanup_needed', label: 'Area needs cleanup' }
-                ],
-                'facilities_grounds': [
-                    { value: 'mowing_trash', label: 'Mowing/trash at Town facility' },
-                    { value: 'building_issue', label: 'Building maintenance' },
-                    { value: 'grounds_issue', label: 'Grounds maintenance' }
-                ],
-                'sewer': [
-                    { value: 'sewer_backup', label: 'Sewer backup/odor (route)' },
-                    { value: 'manhole_issue', label: 'Manhole problem' },
-                    { value: 'sewer_smell', label: 'Sewer odor' }
-                ]
-            },
-            mockRequests: {}
-        };
-
-        // Navigation Functions
-        function showSection(section) {
-            // Hide all sections
-            document.getElementById('home-section').style.display = section === 'home' ? 'block' : 'none';
-            document.getElementById('report-section').classList.toggle('active', section === 'report');
-            document.getElementById('lookup-section').classList.toggle('active', section === 'lookup');
-            document.getElementById('knowledge-section').style.display = section === 'knowledge' ? 'block' : 'none';
-            
-            appState.currentSection = section;
-            
-            // Update URL hash
-            window.location.hash = section;
-        }
-
-        // Category Selection
-        function selectCategory(categoryId) {
-            appState.selectedCategory = categoryId;
-            document.getElementById('category').value = categoryId;
-            updateSubcategories();
-            showSection('report');
-            
-            // Scroll to form
-            document.getElementById('report-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function updateSubcategories() {
-            const categorySelect = document.getElementById('category');
-            const subcategorySelect = document.getElementById('subcategory');
-            const category = categorySelect.value;
-            
-            // Clear existing options
-            subcategorySelect.innerHTML = '<option value="">Select specific issue (optional)</option>';
-            
-            if (category && appState.subcategoryMap[category]) {
-                appState.subcategoryMap[category].forEach(sub => {
-                    const option = document.createElement('option');
-                    option.value = sub.value;
-                    option.textContent = sub.label;
-                    subcategorySelect.appendChild(option);
-                });
-            }
-        }
-
-        // Location Type Handling
-        function handleLocationTypeChange() {
-            const locationType = document.querySelector('input[name="location_type"]:checked')?.value;
-            const addressFields = document.getElementById('address-fields');
-            const intersectionFields = document.getElementById('intersection-fields');
-            
-            if (locationType === 'address') {
-                addressFields.style.display = 'block';
-                intersectionFields.style.display = 'none';
-                document.getElementById('address').required = true;
-                document.getElementById('intersection_primary').required = false;
-                document.getElementById('intersection_cross').required = false;
-            } else if (locationType === 'intersection') {
-                addressFields.style.display = 'none';
-                intersectionFields.style.display = 'block';
-                document.getElementById('address').required = false;
-                document.getElementById('intersection_primary').required = true;
-                document.getElementById('intersection_cross').required = true;
-            } else {
-                addressFields.style.display = 'none';
-                intersectionFields.style.display = 'none';
-            }
-        }
-
-        // Priority Selection
-        function selectPriority(priority) {
-            document.querySelectorAll('.priority-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            document.querySelector(`[data-priority="${priority}"]`).classList.add('selected');
-            document.getElementById('priority').value = priority;
-            appState.selectedPriority = priority;
-        }
-
-        // Photo Upload Handling
-        function initPhotoUpload() {
-            const uploadArea = document.getElementById('photo-upload');
-            const fileInput = document.getElementById('photo-input');
-            const preview = document.getElementById('photo-preview');
-            
-            uploadArea.addEventListener('click', () => fileInput.click());
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                handleFiles(e.dataTransfer.files);
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                handleFiles(e.target.files);
-            });
-        }
-
-        function handleFiles(files) {
-            const maxFiles = 6;
-            const maxSize = 10 * 1024 * 1024; // 10MB per file
-            
-            for (let file of files) {
-                if (appState.uploadedPhotos.length >= maxFiles) {
-                    alert(`Maximum ${maxFiles} photos allowed.`);
-                    break;
-                }
-                
-                if (file.size > maxSize) {
-                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
-                    continue;
-                }
-                
-                if (!file.type.startsWith('image/')) {
-                    alert(`File ${file.name} is not an image.`);
-                    continue;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const photoData = {
-                        id: Date.now() + Math.random(),
-                        file: file,
-                        dataUrl: e.target.result,
-                        name: file.name
-                    };
-                    
-                    appState.uploadedPhotos.push(photoData);
-                    renderPhotoPreview();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function renderPhotoPreview() {
-            const preview = document.getElementById('photo-preview');
-            preview.innerHTML = '';
-            
-            appState.uploadedPhotos.forEach((photo) => {
-                const photoItem = document.createElement('div');
-                photoItem.className = 'photo-item';
-                photoItem.innerHTML = `
-                    <img src="${photo.dataUrl}" alt="${photo.name}">
-                    <button type="button" class="photo-remove" onclick="removePhoto('${photo.id}')">×</button>
-                `;
-                preview.appendChild(photoItem);
-            });
-        }
-
-        function removePhoto(photoId) {
-            appState.uploadedPhotos = appState.uploadedPhotos.filter(photo => photo.id !== photoId);
-            renderPhotoPreview();
-        }
-
-        // Form Submission
-        function generateRequestId() {
-            const today = new Date();
-            const dateStr = today.getFullYear().toString() + 
-                          (today.getMonth() + 1).toString().padStart(2, '0') + 
-                          today.getDate().toString().padStart(2, '0');
-            const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
-            return `SUT-${dateStr}-${randomStr}`;
-        }
-
-        async function submitRequest(formData) {
-            // Simulate API call with delay
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    const requestId = generateRequestId();
-                    
-                    // Store in mock database
-                    appState.mockRequests[requestId] = {
-                        id: requestId,
-                        email: formData.reporter_email,
-                        category: formData.category,
-                        subcategory: formData.subcategory || 'N/A',
-                        description: formData.description,
-                        status: 'received',
-                        created_at: new Date().toISOString(),
-                        location: formData.location_type === 'address' ? 
-                                 formData.address : 
-                                 `${formData.intersection_primary} & ${formData.intersection_cross}`,
-                        priority: formData.priority,
-                        reporter_name: formData.reporter_name,
-                        photos_count: appState.uploadedPhotos.length
-                    };
-                    
-                    resolve({ success: true, requestId: requestId });
-                }, 2000); // 2 second delay to simulate processing
-            });
-        }
-
-        // Status Lookup
-        function lookupStatus(email, requestId) {
-            const request = appState.mockRequests[requestId];
-            
-            if (!request) {
-                return { success: false, error: 'Request not found' };
-            }
-            
-            if (request.email.toLowerCase() !== email.toLowerCase()) {
-                return { success: false, error: 'Email does not match our records' };
-            }
-            
-            return { success: true, request: request };
-        }
-
-        function displayStatusResult(request) {
-            const statusResult = document.getElementById('status-result');
-            const statusDetails = document.getElementById('status-details');
-            
-            const statusLabels = {
-                'received': 'Received',
-                'in_review': 'In Review',
-                'scheduled': 'Scheduled',
-                'in_progress': 'In Progress',
-                'on_hold': 'On Hold',
-                'completed': 'Completed'
-            };
-            
-            const categoryLabels = {
-                'roads_sidewalks': 'Roads & Sidewalks',
-                'trees_row': 'Trees & Vegetation',
-                'signs_markings': 'Signs & Markings',
-                'drainage_stormwater': 'Drainage & Stormwater',
-                'snow_ice': 'Snow & Ice',
-                'litter_dumping': 'Litter & Illegal Dumping',
-                'facilities_grounds': 'Town Facilities',
-                'sewer': 'Sewer'
-            };
-            
-            statusDetails.innerHTML = `
-                <div style="display: grid; gap: 1rem; margin-bottom: 1rem;">
-                    <div><strong>Request ID:</strong> ${request.id}</div>
-                    <div><strong>Status:</strong> <span class="status-badge status-${request.status}">${statusLabels[request.status]}</span></div>
-                    <div><strong>Category:</strong> ${categoryLabels[request.category]}</div>
-                    <div><strong>Location:</strong> ${request.location}</div>
-                    <div><strong>Submitted:</strong> ${new Date(request.created_at).toLocaleDateString()}</div>
-                    <div><strong>Priority:</strong> ${request.priority.charAt(0).toUpperCase() + request.priority.slice(1)}</div>
-                </div>
-                <div style="background: rgba(15, 61, 46, 0.05); padding: 1rem; border-radius: 8px;">
-                    <strong>Description:</strong><br>
-                    ${request.description}
-                </div>
-                <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
-                    We typically provide the first update within 3 business days. You'll receive email notifications when the status changes.
-                </div>
-            `;
-            
-            statusResult.style.display = 'block';
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize photo upload
-            initPhotoUpload();
-            
-            // Handle hash-based navigation
-            const hash = window.location.hash.substring(1);
-            if (hash) {
-                showSection(hash);
-            }
-            
-            // Category card clicks
-            document.querySelectorAll('.category-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    selectCategory(card.dataset.category);
-                });
-            });
-            
-            // Navigation clicks
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const section = link.getAttribute('href').substring(1);
-                    showSection(section);
-                });
-            });
-            
-            // Priority selection
-            document.querySelectorAll('.priority-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    selectPriority(option.dataset.priority);
-                });
-            });
-            
-            // Location type radio buttons
-            document.querySelectorAll('input[name="location_type"]').forEach(radio => {
-                radio.addEventListener('change', handleLocationTypeChange);
-            });
-            
-            // Category dropdown change
-            document.getElementById('category').addEventListener('change', updateSubcategories);
-            
-            // Form submission
-            document.getElementById('issue-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const submitBtn = document.getElementById('submit-btn');
-                const submitText = document.getElementById('submit-text');
-                const submitLoading = document.getElementById('submit-loading');
-                const successMessage = document.getElementById('success-message');
-                const errorMessage = document.getElementById('error-message');
-                
-                // Reset messages
-                successMessage.classList.remove('show');
-                errorMessage.classList.remove('show');
-                
-                // Show loading state
-                submitBtn.disabled = true;
-                submitText.style.display = 'none';
-                submitLoading.style.display = 'inline-block';
-                
-                try {
-                    // Collect form data
-                    const formData = new FormData(e.target);
-                    const data = Object.fromEntries(formData.entries());
-                    
-                    // Add location data based on type
-                    if (data.location_type === 'intersection') {
-                        data.address = `${data.intersection_primary} & ${data.intersection_cross}`;
-                    }
-                    
-                    // Submit request
-                    const result = await submitRequest(data);
-                    
-                    if (result.success) {
-                        document.getElementById('request-id-display').textContent = result.requestId;
-                        successMessage.classList.add('show');
-                        
-                        // Reset form
-                        e.target.reset();
-                        appState.uploadedPhotos = [];
-                        renderPhotoPreview();
-                        document.getElementById('priority').value = 'normal';
-                        selectPriority('normal');
-                        
-                        // Scroll to success message
-                        successMessage.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                        throw new Error(result.error || 'Submission failed');
-                    }
-                } catch (error) {
-                    document.getElementById('error-details').textContent = error.message;
-                    errorMessage.classList.add('show');
-                    errorMessage.scrollIntoView({ behavior: 'smooth' });
-                } finally {
-                    // Reset button state
-                    submitBtn.disabled = false;
-                    submitText.style.display = 'inline';
-                    submitLoading.style.display = 'none';
-                }
-            });
-            
-            // Status lookup form
-            document.getElementById('lookup-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const email = document.getElementById('lookup_email').value;
-                const requestId = document.getElementById('lookup_id').value.toUpperCase();
-                
-                const result = lookupStatus(email, requestId);
-                
-                if (result.success) {
-                    displayStatusResult(result.request);
-                } else {
-                    document.getElementById('status-result').innerHTML = `
-                        <div style="color: var(--red); padding: 1rem; background: #fee2e2; border-radius: 8px;">
-                            <strong>❌ ${result.error}</strong><br>
-                            Please check your email address and request ID and try again.
-                        </div>
-                    `;
-                    document.getElementById('status-result').style.display = 'block';
-                }
-            });
-            
-            // Check for weather alerts (mock implementation)
-            const now = new Date();
-            const month = now.getMonth();
-            if (month >= 10 || month <= 2) { // Nov-Feb
-                document.getElementById('weather-alert').classList.add('active');
-            }
-        });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                showSection('home');
-            }
-        });
-
-        // Responsive menu toggle (for mobile)
-        function toggleMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
-        }
-    </script>
+async function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=> resolve(String(r.result).split(',')[1] || '');
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+</script>
 </body>
 </html>
